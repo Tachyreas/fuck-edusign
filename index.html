@@ -133,14 +133,14 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script>
+    <script type="module">
         async function fetchData(url) {
           const response = await fetch(url);
           const data = await response.json();
           return data;
         }
 
-        let classrooms = fetchData( "classrooms.json" );
+        let classrooms = await fetchData( "classrooms.json" );
 
         const searchInput = document.getElementById('roomSearch');
         const searchResults = document.getElementById('searchResults');
@@ -207,7 +207,7 @@
             `;
         }
 
-        function selectRoom(name, url) {
+        export function selectRoom(name, url) {
             selectedRoom = { name, url };
             
             // Update selected state
