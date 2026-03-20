@@ -87,12 +87,12 @@
             color: white;
             font-size: 1.8rem;
         }
-        .load-json-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-        }
+        <!-- .load-json-btn { -->
+        <!--     position: fixed; -->
+        <!--     top: 20px; -->
+        <!--     left: 20px; -->
+        <!--     z-index: 1000; -->
+        <!-- } -->
         #jsonFile {
             display: none;
         }
@@ -100,10 +100,6 @@
 </head>
 <body>
     <input type="file" id="jsonFile" accept=".json">
-    <button class="btn btn-primary load-json-btn" onclick="document.getElementById('jsonFile').click()">
-        📁 Charger JSON
-    </button>
-
     <div class="container">
         <div class="card">
             <div class="card-body p-4">
@@ -129,127 +125,15 @@
                 <div id="searchResults"></div>
                 <div id="qrcodeContainer"></div>
             </div>
+        <button class="btn btn-primary load-json-btn" onclick="document.getElementById('jsonFile').click()">
+          📁 Charger JSON
+        </button>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script type="module">
-        async function fetchData(url) {
-          const response = await fetch(url);
-          const data = await response.json();
-          return data;
-        }
+    <script src="script.js" type="module">
 
-        let classrooms = await fetchData( "classrooms.json" );
-
-        const searchInput = document.getElementById('roomSearch');
-        const searchResults = document.getElementById('searchResults');
-        const qrcodeContainer = document.getElementById('qrcodeContainer');
-        const jsonFileInput = document.getElementById('jsonFile');
-        let selectedRoom = null;
-
-        // Gestion du chargement du fichier JSON
-        jsonFileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                try {
-                    const data = JSON.parse(event.target.result);
-                    classrooms = data;
-                    alert(`✅ ${classrooms.length} salles chargées avec succès !`);
-                    searchInput.value = '';
-                    searchResults.innerHTML = '';
-                    qrcodeContainer.innerHTML = '';
-                    searchInput.focus();
-                } catch (error) {
-                    alert('❌ Erreur lors du chargement du fichier JSON. Vérifiez le format.');
-                    console.error(error);
-                }
-            };
-            reader.readAsText(file);
-        });
-
-        function searchRooms(query) {
-            if (!query.trim()) {
-                searchResults.innerHTML = '';
-                qrcodeContainer.innerHTML = '';
-                return;
-            }
-
-            const filtered = classrooms.filter(room => 
-                room.name.toLowerCase().includes(query.toLowerCase())
-            );
-
-            if (filtered.length === 0) {
-                searchResults.innerHTML = `
-                    <div class="no-results">
-                        <p class="mb-0">Aucune salle trouvée pour "${query}"</p>
-                    </div>
-                `;
-                qrcodeContainer.innerHTML = '';
-                return;
-            }
-
-            searchResults.innerHTML = `
-                <div class="mb-3">
-                    <span class="badge bg-primary">
-                        ${filtered.length} salle${filtered.length > 1 ? 's' : ''} trouvée${filtered.length > 1 ? 's' : ''}
-                    </span>
-                </div>
-                ${filtered.map(room => `
-                    <div class="result-item" onclick="selectRoom('${room.name}', '${room.url}')">
-                        <strong>Salle ${room.name}</strong>
-                        <span class="float-end">→</span>
-                    </div>
-                `).join('')}
-            `;
-        }
-
-        export function selectRoom(name, url) {
-            selectedRoom = { name, url };
-            
-            // Update selected state
-            document.querySelectorAll('.result-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-            event.target.closest('.result-item').classList.add('selected');
-
-            generateQRCode(name, url);
-        }
-
-        function generateQRCode(name, url) {
-            qrcodeContainer.innerHTML = `
-                <div class="qr-container">
-                    <h4 class="mb-3">
-                        Salle ${name}
-                    </h4>
-                    <div id="qrcode"></div>
-                    <div class="mt-3">
-                        <a href="${url}" target="_blank" class="btn btn-outline-primary">
-                            Ouvrir le lien
-                        </a>
-                    </div>
-                </div>
-            `;
-
-            new QRCode(document.getElementById('qrcode'), {
-                text: url,
-                width: 256,
-                height: 256,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        }
-
-        searchInput.addEventListener('input', (e) => {
-            searchRooms(e.target.value);
-        });
-
-        // Mise au point sur le champ de recherche au chargement
-        searchInput.focus();
     </script>
 </body>
 </html>
